@@ -7,7 +7,7 @@ class SnowRuler(cellular.Ruler):
     sizeX = 250
     sizeY = 250
     initialSpawnChance = 0.05
-    runningSpawnChance = 0.0
+    runningSpawnChance = 0.001
     cmap = colors.ListedColormap(['black', 'xkcd:ice blue',])
     
     def __init__(self):
