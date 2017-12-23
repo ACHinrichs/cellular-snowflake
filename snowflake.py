@@ -4,19 +4,21 @@ from matplotlib import colors
 import random
 
 class SnowRuler(cellular.Ruler):
-    sizeX = 500
-    sizeY = 500
-    initialSpawnChance = 0.1
+    sizeX = 250
+    sizeY = 250
+    initialSpawnChance = 0.025
+    runningSpawnChance = 0.0025
+    cmap = colors.ListedColormap(['black', 'xkcd:ice blue',])
     
     def __init__(self):
-        self.cmap = colors.ListedColormap(['black', 'xkcd:ice blue',])
+        pass
 
     def move(self, x , y, dirX, dirY,field=None,newField=None):
         if(not (0<=x<self.sizeX)) or not( (0<=y<self.sizeY)):
-            return newField
+            return (field,newField)
         
         if not (field[x][y] == 1):
-            return newField
+            return (field,newField)
 
         field[x][y] = 0
 
@@ -33,7 +35,7 @@ class SnowRuler(cellular.Ruler):
         return (field,newField)
         
     def rule(self,x,y,field=None,newField=None):
-        if(field[x][y] == 1):
+        if( field[x][y] == 1):
             direction = random.randint(1,4)
             if direction == 1:
                 field,newField=self.move(x,y, 0,-1,field,newField)
@@ -54,6 +56,49 @@ class SnowRuler(cellular.Ruler):
                     initialField[x][y]=1
         return initialField
 
-sim = cellular.Automaton(SnowRuler())
-sim.delay=0.1
+class NonMovingSnowRuler(SnowRuler):
+
+    cmap = colors.ListedColormap(['black','white', 'xkcd:ice blue','blue'])
+    def move(self, x , y, dirX, dirY,field=None,newField=None):
+        if(not (0<=x<self.sizeX)) or not( (0<=y<self.sizeY)):
+            return newField
+
+        if field[x][y]==2:
+            newField[x][y]==2
+        if not (field[x][y] == 1):
+            return (newField,field)
+
+        #field[x][y] = 0
+
+        
+        newX = (x + dirX + self.sizeX)%self.sizeX
+        newY = (y + dirY + self.sizeY)%self.sizeY
+
+        
+        if(field[(x-1+self.sizeX)%self.sizeX][y]>=2 or
+           field[(x+1)%self.sizeX           ][y]>=2 or
+           field[x]           [(y+1)%self.sizeY]>=2 or
+           field[x][(y-1+self.sizeY)%self.sizeY]>=2 or
+           field[newX][newY]>=2):
+           newField[x][y]=2
+        elif(newField[newX][newY]==0):
+           newField[newX][newY] = 1
+        return (field,newField)
+    
+    def rule(self,x,y,field=None,newField=None):
+        if(field[x][y]>=2):
+            newField[x][y]=2
+        else:
+            field,newField = super(NonMovingSnowRuler,self).rule(x,y,field,newField)
+        if newField[x][y]==0 and random.random()<self.runningSpawnChance:
+            newField[x][y]=1
+        return (field,newField)
+
+    def initField(self):
+        initialField = super(NonMovingSnowRuler,self).initField()
+        initialField[self.sizeX // 2][self.sizeY // 2]=3
+        return initialField
+
+sim = cellular.Automaton(NonMovingSnowRuler())
+sim.delay=0
 sim.start()
