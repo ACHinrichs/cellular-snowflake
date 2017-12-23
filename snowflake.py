@@ -6,8 +6,8 @@ import random
 class SnowRuler(cellular.Ruler):
     sizeX = 250
     sizeY = 250
-    initialSpawnChance = 0.025
-    runningSpawnChance = 0.0025
+    initialSpawnChance = 0.05
+    runningSpawnChance = 0.0
     cmap = colors.ListedColormap(['black', 'xkcd:ice blue',])
     
     def __init__(self):
@@ -71,14 +71,15 @@ class NonMovingSnowRuler(SnowRuler):
         #field[x][y] = 0
 
         
-        newX = (x + dirX + self.sizeX)%self.sizeX
-        newY = (y + dirY + self.sizeY)%self.sizeY
 
+        sticking = False
+        for dX,dY in [(-1,1),(0,1),(1,1),(1,0),(1,-1),(0,-1),(-1,-1),(-1,0)]:
+            if(field[(x+dX+self.sizeX)%self.sizeX][(y+dY+self.sizeY)%self.sizeY]>=2):
+                sticking=True
+        newX = (x+dirX+self.sizeX)%self.sizeX
+        newY = (y+dirY+self.sizeY)%self.sizeY
         
-        if(field[(x-1+self.sizeX)%self.sizeX][y]>=2 or
-           field[(x+1)%self.sizeX           ][y]>=2 or
-           field[x]           [(y+1)%self.sizeY]>=2 or
-           field[x][(y-1+self.sizeY)%self.sizeY]>=2 or
+        if(sticking or
            field[newX][newY]>=2):
            newField[x][y]=2
         elif(newField[newX][newY]==0):
@@ -86,8 +87,10 @@ class NonMovingSnowRuler(SnowRuler):
         return (field,newField)
     
     def rule(self,x,y,field=None,newField=None):
-        if(field[x][y]>=2):
+        if(field[x][y]==2):
             newField[x][y]=2
+        elif(field[x][y]==3):
+            newField[x][y]=3
         else:
             field,newField = super(NonMovingSnowRuler,self).rule(x,y,field,newField)
         if newField[x][y]==0 and random.random()<self.runningSpawnChance:
