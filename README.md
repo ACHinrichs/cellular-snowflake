@@ -1,6 +1,6 @@
 Cellular-Snowflake-Simulation
 =============================
-Briefly seen on [this Computerfile
+Briefly seen on [this Computerphile
 Video](https://www.youtube.com/watch?v=TU3IQRV6LV0), I feelt the urge
 to implement something similar, and this is it.
 
