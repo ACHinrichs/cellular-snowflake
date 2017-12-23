@@ -4,10 +4,10 @@ from matplotlib import colors
 import random
 
 class SnowRuler(cellular.Ruler):
-    sizeX = 250
-    sizeY = 250
+    sizeX = 150
+    sizeY = 150
     initialSpawnChance = 0.05
-    runningSpawnChance = 0.001
+    runningSpawnChance = 0.002
     cmap = colors.ListedColormap(['black', 'xkcd:ice blue',])
     
     def __init__(self):
@@ -93,7 +93,10 @@ class NonMovingSnowRuler(SnowRuler):
             newField[x][y]=3
         else:
             field,newField = super(NonMovingSnowRuler,self).rule(x,y,field,newField)
-        if newField[x][y]==0 and random.random()<self.runningSpawnChance:
+        if (newField[x][y]==0 and
+            (not (self.sizeX/4 < x < 3*self.sizeX/4 and
+                  self.sizeY/4 < y < 3*self.sizeY/4)) and
+            random.random()<self.runningSpawnChance):
             newField[x][y]=1
         return (field,newField)
 
